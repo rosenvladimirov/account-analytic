@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="invoice_analystic_form" model="ir.ui.view">
+            <field name="name">account.invoice.analystic.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook/page[@name='other_info']/group/group[1]/field[@name='account_id']" position="after">
+                    <field name="account_analytic_id" groups="account.group_account_user"/>
+                    <field name="analytic_tag_ids" widget="many2many_tags" groups="account.group_account_user"/>
+                </xpath>
+            </field>
+        </record>
+        <record id="invoice_supplier_analystic_form" model="ir.ui.view">
+            <field name="name">account.invoice.supplier.analystic.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook/page[@name='other_info']/group/group[1]/field[@name='account_id']" position="after">
+                    <field name="account_analytic_id" groups="account.group_account_user"/>
+                    <field name="analytic_tag_ids" widget="many2many_tags" groups="account.group_account_user"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
