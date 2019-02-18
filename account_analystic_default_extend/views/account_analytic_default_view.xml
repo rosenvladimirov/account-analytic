@@ -23,6 +23,7 @@
                     <field name="state_id"/>
                     <field name="country_id"/>
                     <field name="operation_type"/>
+                    <field name="documents_type"/>
                 </field>
             </field>
         </record>
@@ -41,6 +42,7 @@
                         <group>
                             <field name="sequence"/>
                             <field name="operation_type"/>
+                            <field name="documents_type"/>
                         </group>
                     </group>
                     <group name="conditions" string="Conditions">
