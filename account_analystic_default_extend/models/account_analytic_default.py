@@ -12,8 +12,8 @@ class AccountAnalyticDefault(models.Model):
 
     analytic_tag_ids = fields.Many2many(comodel_name='account.analytic.tag', relation="rel_default_analytic_tag", string='Debit Analytic tags', ondelete='restrict')
 
-    categ_id = fields.Many2one('product.category', string='Internal Category', ondelete='restrict')
-    state_id = fields.Many2one("res.country.state", string='State', ondelete='restrict')
+    categ_id = fields.Many2one('product.category', string='Internal Category', ondelete='restrict', domain=[('child_id', '=', False)])
+    #state_id = fields.Many2one("res.country.state", string='State', ondelete='restrict')
     country_id = fields.Many2one('res.country', string='Country', ondelete='restrict')
     location_id = fields.Many2one('stock.location', string='Source Location', ondelete='restrict')
     usage = fields.Selection([
@@ -58,30 +58,39 @@ class AccountAnalyticDefault(models.Model):
         return index
 
     @api.model
-    def account_get(self, product_id=None, partner_id=None, user_id=None, date=None, company_id=None, operation_type='boot', categ_id=None, state_id=None, country_id=None, location_id=None, location_usage=None, documents_type='saleorder'):
+    def account_get(self, product_id=None, partner_id=None, user_id=None, date=None, company_id=None, operation_type='boot', categ_id=None, country_id=None, location_id=None, location_usage=None, documents_type='saleorder'):
         def cat_search(cat_id):
             res = []
             cat = self.env['product.category'].browse(cat_id)
             while cat:
                 res.append(cat.id)
                 cat = cat.parent_id
+                _logger.info("Category %s" % cat.name)
+            return res
+
+        def location_search(location_id):
+            res = []
+            location = self.env['stock.location'].browse(location_id)
+            while location:
+                res.append(location.id)
+                location = location.location_id
             return res
 
         domain = []
         if product_id:
             domain += ['|', ('product_id', '=', product_id)]
-            domain += ['|', ('categ_id', 'in', cat_search(categ_id))]
+            #domain += ['|', ('categ_id', 'in', cat_search(categ_id))]
+            domain += [('categ_id', '=', categ_id)]
         domain += [('product_id', '=', False)]
         if partner_id:
             domain += ['|', ('partner_id', '=', partner_id)]
-            domain += ['|', ('state_id', '=', state_id)]
-            domain += ['|', ('country_id', '=', country_id)]
+            domain += [('country_id', '=', country_id)]
         domain += [('partner_id', '=', False)]
         if location_id:
-            domain += ['&', ('location_id', '=', location_id)]
-            domain += ['|', ('usage', '=', location_usage)]
+            domain += ['|', ('location_id', 'in', location_search(location_id))]
+            domain += [('usage', '=', location_usage)]
         domain += [('location_id', '=', False)]
-        domain += self._get_default(domain)
+        domain = self._get_default(domain)
         if company_id:
             domain += ['|', ('company_id', '=', company_id)]
         domain += [('company_id', '=', False)]
@@ -92,7 +101,7 @@ class AccountAnalyticDefault(models.Model):
             domain += ['|', ('date_start', '<=', date), ('date_start', '=', False)]
             domain += ['|', ('date_stop', '>=', date), ('date_stop', '=', False)]
         domain += [('operation_type', '=', operation_type), ('documents_type', '=', documents_type)]
-        #_logger.info("DOMEIN: %s" % domain)
+        _logger.info("DOMAIN: %s" % domain)
         best_index = -1
         res = self.env['account.analytic.default']
         for rec in self.search(domain):
@@ -100,10 +109,9 @@ class AccountAnalyticDefault(models.Model):
             if rec.product_id: index += 1
             if rec.categ_id: index += 1
             if rec.partner_id: index += 1
-            if rec.state_id: index += 1
             if rec.country_id: index += 1
             if rec.location_id: index += 1
-            index += self._get_index(index)
+            index = self._get_index(index)
             if rec.company_id: index += 1
             if rec.user_id: index += 1
             if rec.date_start: index += 1
@@ -111,7 +119,7 @@ class AccountAnalyticDefault(models.Model):
             if index > best_index:
                 res = rec
                 best_index = index
-            #_logger.info("Line %s" % rec)
+            _logger.info("Line %s:%s=>%s" % (rec.categ_id, rec.analytic_id.name, best_index))
         return res
 
 
@@ -131,45 +139,45 @@ class AccountInvoice(models.Model):
             res['analytic_tag_ids'] = [(6, 0, self.analytic_tag_ids.ids)]
         return res
 
-    @api.model
-    def create(self, vals):
-        if 'partner_id' in vals:
-            documents_type = self._context.get('type', 'out_invoice')
-            operation_type = 'debit' if documents_type in ('out_invoice', 'in_refund') else 'credit'
-            rec = self.env['account.analytic.default'].account_get(partner_id=vals['partner_id'], user_id=vals['user_id'], date=fields.Date.today(),
-                                                                   company_id=vals['company_id'], operation_type=operation_type, documents_type=documents_type)
+    @api.onchange('partner_id')
+    def _onchange_partner_id(self):
+        res = super(AccountInvoice, self)._onchange_partner_id()
+        # render for header
+        if not self.account_analytic_id or not self.analytic_tag_ids:
+            self_type = self._context.get('type', False)
+            if not self_type:
+                self_type = self.type
+            operation_type = 'debit' if self_type in ('out_invoice', 'in_refund') else 'credit'
+            rec = self.env['account.analytic.default'].account_get(False, self.commercial_partner_id.id, self.user_id.id,
+                                                fields.Date.today(), operation_type=operation_type,
+                                                country_id=self.commercial_partner_id.country_id.id, documents_type=self_type)
             if rec:
-                vals['account_analytic_id'] = rec.analytic_id.id
-                vals['analytic_tag_ids'] = [(6, 0, res.analytic_tag_ids.ids)]
-        return super(AccountInvoice, self).create(vals)
-
-    @api.multi
-    def write(self, vals):
-        res = super(AccountInvoice, self).write(vals)
-        if 'partner_id' in vals:
-            partner_id = self.env['res.partner'].browse(vals['partner_id']).commercial_partner_id
-            documents_type = self.type
-            operation_type = 'debit' if documents_type in ('out_invoice', 'in_refund') else 'credit'
-            rec = self.env['account.analytic.default'].account_get(partner_id=partner_id.id, user_id=self.user_id, country_id=partner_id.country_id.id,
-                                                                date=fields.Date.today(), company_id=self.company_id.id, operation_type=operation_type, documents_type=documents_type)
-            if rec:
-                self.account_analytic_id = self.analytic_id.id
-                self.analytic_tag_ids = [(6, 0, self.analytic_tag_ids.ids)]
+                if not self.account_analytic_id:
+                    self.account_analytic_id = rec.analytic_id.id
+                if not self.analytic_tag_ids:
+                    self.analytic_tag_ids = rec.analytic_tag_ids.ids
         return res
 
-    def _prepare_invoice_line_from_po_line(self, line):
-        documents_type = self.type
-        operation_type = 'debit' if documents_type in ('out_invoice', 'in_refund') else 'credit'
-        res = self._prepare_invoice_line_from_po_line(line)
-        rec = self.env['account.analytic.default'].account_get(self.product_id.id, self.invoice_id.commercial_partner_id.id, self.env.uid,
-                                                            fields.Date.today(), company_id=self.company_id.id, operation_type=operation_type,
-                                                            categ_id=self.product_id.product_tmpl_id.categ_id.id, state_id=self.invoice_id.commercial_partner_id.state_id.id,
-                                                            country_id=self.invoice_id.commercial_partner_id.country_id.id, documents_type=documents_type)
-        if rec:
-            if not res['account_analytic_id']:
-                res['account_analytic_id'] = rec.analytic_id.ids
-            res['analytic_tag_ids'] = [(6, 0, list(set().union(rec.analytic_tag_ids.ids + self.analytic_tag_ids and self.analytic_tag_ids.ids or [])))]
-        return res
+    @api.onchange('purchase_id')
+    def purchase_order_change(self):
+        _logger.info("ONCHANGE_PURCHASE_ID %s" % dict(self.env.context, force_document_type='purchaseorder'))
+        if not self.purchase_id:
+            return {}
+        if not self.partner_id:
+            self.partner_id = self.purchase_id.partner_id.id
+
+        new_lines = self.env['account.invoice.line']
+        for line in self.purchase_id.order_line - self.invoice_line_ids.mapped('purchase_line_id'):
+            data = self._prepare_invoice_line_from_po_line(line)
+            new_line = new_lines.new(data)
+            new_line.with_context(dict(self.env.context, force_document_type='purchaseorder'))._set_additional_fields(self)
+            new_lines += new_line
+
+        self.invoice_line_ids += new_lines
+        self.payment_term_id = self.purchase_id.payment_term_id
+        self.env.context = dict(self.env.context, from_purchase_order_change=True)
+        self.purchase_id = False
+        return {}
 
 
 class AccountInvoiceLine(models.Model):
@@ -177,42 +185,56 @@ class AccountInvoiceLine(models.Model):
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
-        operation_type = 'credit' if self.invoice_id.type in ('out_invoice', 'in_refund') else 'debit'
-        documents_type = self.type
+        self_type = self._context.get('type', False)
+        if not self_type:
+            self_type = self.invoice_id.type
+        operation_type = 'credit' if self_type in ('out_invoice', 'in_refund') else 'debit'
         res = super(AccountInvoiceLine, self)._onchange_product_id()
         rec = self.env['account.analytic.default'].account_get(self.product_id.id, self.invoice_id.commercial_partner_id.id, self.env.uid,
-                                                            fields.Date.today(), company_id=self.company_id.id, operation_type=operation_type,
-                                                            categ_id=self.product_id.product_tmpl_id.categ_id.id, state_id=self.invoice_id.commercial_partner_id.state_id.id,
-                                                            country_id=self.invoice_id.commercial_partner_id.country_id.id, documents_type=documents_type)
+                                                        fields.Date.today(), company_id=self.company_id.id, operation_type=operation_type,
+                                                        categ_id=self.product_id.product_tmpl_id.categ_id.id,
+                                                        country_id=self.invoice_id.commercial_partner_id.country_id.id, documents_type=self_type)
         if rec:
             self.account_analytic_id = rec.analytic_id.id
-            self.analytic_tag_ids = [(6, 0, rec.analytic_tag_ids.ids + self.analytic_tag_ids.ids)]
+            self.analytic_tag_ids = [(6, 0, list(set().union(rec.analytic_tag_ids.ids + self.analytic_tag_ids.ids)))]
         return res
 
     def _set_additional_fields(self, invoice):
-        _logger.info("DEFAULT %s:%s" % (self.invoice_id.account_analytic_id, self.invoice_id.analytic_tag_ids))
+        _logger.info("ADDITIONAL FIELDS %s:%s" % (self.account_analytic_id, self.analytic_tag_ids))
+        account_analytic = self.env['account.analytic.default']
+
+        # render for lines
         if not self.account_analytic_id or not self.analytic_tag_ids:
-            operation_type = 'credit' if self.invoice_id.type in ('out_invoice', 'in_refund') else 'debit'
-            documents_type = self.type
-            rec = self.env['account.analytic.default'].account_get(self.product_id.id, self.invoice_id.commercial_partner_id.id, self.env.uid,
+            self_type = self._context.get('type', False)
+            if not self_type:
+                self_type = invoice.type
+            if self._context.get('purchaseorder', False):
+                operation_type = 'debit'
+            elif self._context.get('saleorder', False):
+                operation_type = 'credit'
+            else:
+                operation_type = 'credit' if self_type in ('out_invoice', 'in_refund') else 'debit'
+
+            rec = account_analytic.account_get(self.product_id.id, invoice.commercial_partner_id.id, self.env.uid,
                                                                 fields.Date.today(), company_id=self.company_id.id, operation_type=operation_type,
-                                                                categ_id=self.product_id.product_tmpl_id.categ_id.id, state_id=self.invoice_id.commercial_partner_id.state_id.id,
-                                                                country_id=self.invoice_id.commercial_partner_id.country_id.id, documents_type=documents_type)
+                                                                categ_id=self.product_id.product_tmpl_id.categ_id.id,
+                                                                country_id=invoice.commercial_partner_id.country_id.id, documents_type=self_type)
             if rec:
                 if not self.account_analytic_id:
                     self.account_analytic_id = rec.analytic_id.id
-                if not self.analytic_tag_ids:
-                    self.analytic_tag_ids = [(6, 0, list(set().union(rec.analytic_tag_ids.ids + self.analytic_tag_ids and self.analytic_tag_ids.ids or [])))]
+                _logger.info("self.analytic_tag_ids.ids = %s" % (list(set().union(rec.analytic_tag_ids.ids + self.analytic_tag_ids.ids))))
+                if self.analytic_tag_ids:
+                    self.analytic_tag_ids = rec.analytic_tag_ids.ids
 
-        if not self.invoice_id.account_analytic_id or not self.invoice_id.analytic_tag_ids:
-            operation_type = 'debit' if self.invoice_id.type in ('out_invoice', 'in_refund') else 'credit'
-            documents_type = self.type
-            rec = self.env['account.analytic.default'].account_get(self.product_id.id, self.invoice_id.commercial_partner_id.id, self.env.uid,
-                                                                fields.Date.today(), company_id=self.company_id.id, operation_type=operation_type,
-                                                                categ_id=self.product_id.product_tmpl_id.categ_id.id, state_id=self.invoice_id.commercial_partner_id.state_id.id,
-                                                                country_id=self.invoice_id.commercial_partner_id.country_id.id, documents_type=documents_type)
+        # render for header
+        if not invoice.account_analytic_id or not invoice.analytic_tag_ids:
+            operation_type = 'credit' if operation_type == 'debit' else 'debit'
+            rec = account_analytic.account_get(False, invoice.commercial_partner_id.id, invoice.user_id.id,
+                                                fields.Date.today(), operation_type=operation_type,
+                                                country_id=invoice.commercial_partner_id.country_id.id, documents_type=self_type)
             if rec:
-                self.invoice_id.account_analytic_id = rec.analytic_id.id
-                self.invoice_id.analytic_tag_ids = [(6, 0, rec.analytic_tag_ids.ids + self.analytic_tag_ids.ids)]
-                self.invoice_id.invalidate_cache(['account_analytic_id', 'analytic_tag_ids'], self.invoice_id)
+                if not invoice.account_analytic_id:
+                    invoice.account_analytic_id = rec.analytic_id.id
+                if not invoice.analytic_tag_ids:
+                    invoice.analytic_tag_ids = rec.analytic_tag_ids.ids
         super(AccountInvoiceLine, self)._set_additional_fields(invoice)

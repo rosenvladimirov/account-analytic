@@ -21,10 +21,10 @@ class StockMove(models.Model):
             od, fd, price_diff_line = res[2] # diff tuple
 
         operation_type = 'debit'
-        documents_type = self.picking_id.code
+        documents_type = self.picking_id and self.picking_id.picking_type_code or 'outgoing'
         default_analytic_account = self.env['account.analytic.default'].account_get(self.product_id.id, self.partner_id.id, self.picking_id.user_id.id,
                                                     fields.Date.today(), operation_type=operation_type, categ_id=self.product_id.product_tmpl_id.categ_id.id,
-                                                    state_id=self.partner_id.state_id.id, country_id=self.partner_id.country_id.id,
+                                                    country_id=self.partner_id.country_id.id,
                                                     location_id=self.location_dest_id.id, location_usage=self.location_dest_id.usage, documents_type=documents_type)
         if default_analytic_account:
             debit_line_vals.update({'account_analytic_id': default_analytic_account.analytic_id.id})
@@ -33,7 +33,7 @@ class StockMove(models.Model):
         operation_type = 'credit'
         default_analytic_account = self.env['account.analytic.default'].account_get(self.product_id.id, self.partner_id.id, self.picking_id.user_id.id,
                                                     fields.Date.today(), operation_type=operation_type, categ_id=self.product_id.product_tmpl_id.categ_id.id,
-                                                    state_id=self.partner_id.state_id.id, country_id=self.partner_id.country_id.id,
+                                                    country_id=self.partner_id.country_id.id,
                                                     location_id=self.location_id.id, location_usage=self.location_id.usage, documents_type=documents_type)
         if default_analytic_account:
             credit_line_vals.update({'account_analytic_id': default_analytic_account.analytic_id.id})
@@ -46,7 +46,7 @@ class StockMove(models.Model):
                 operation_type = 'debit'
             default_analytic_account = self.env['account.analytic.default'].account_get(self.product_id.id, self.partner_id.id, self.picking_id.user_id.id,
                                                         fields.Date.today(), operation_type=operation_type, categ_id=self.product_id.product_tmpl_id.categ_id.id,
-                                                        state_id=self.partner_id.state_id.id, country_id=self.partner_id.country_id.id,
+                                                        country_id=self.partner_id.country_id.id,
                                                         location_id=self.location_dest_id.id, location_usage=self.location_dest_id.usage, documents_type=documents_type)
             if default_analytic_account:
                 price_diff_line.update({'account_analytic_id': default_analytic_account.analytic_id.id})

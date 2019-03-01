@@ -25,197 +25,190 @@ msgid "* Vendor Location: Virtual location representing the source location for 
 "* Procurement: Virtual location serving as temporary counterpart for procurement operations when the source (vendor or production) is not known yet. This location should be empty when the procurement scheduler has finished running.\n"
 "* Production: Virtual counterpart location for production operations: this location consumes the raw material and produces finished products\n"
 "* Transit Location: Counterpart location that should be used in inter-company or inter-warehouses operations"
-msgstr "* Vendor Location: Virtual location representing the source location for products coming from your vendors\n"
-"* View: Virtual location used to create a hierarchical structures for your warehouse, aggregating its child locations ; can't directly contain products\n"
-"* Internal Location: Physical locations inside your own warehouses,\n"
-"* Customer Location: Virtual location representing the destination location for products sent to your customers\n"
-"* Inventory Loss: Virtual location serving as counterpart for inventory operations used to correct stock levels (Physical inventories)\n"
-"* Procurement: Virtual location serving as temporary counterpart for procurement operations when the source (vendor or production) is not known yet. This location should be empty when the procurement scheduler has finished running.\n"
-"* Production: Virtual counterpart location for production operations: this location consumes the raw material and produces finished products\n"
-"* Transit Location: Counterpart location that should be used in inter-company or inter-warehouses operations"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: model:ir.model.fields,field_description:account_analystic_default_extend.field_account_invoice_account_analytic_id
 msgid "Analytic Account"
-msgstr "Konto analityczne"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: model:ir.model,name:account_analystic_default_extend.model_account_analytic_default
 msgid "Analytic Distribution"
-msgstr "Rozbicie analityczne"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: model:ir.model.fields,field_description:account_analystic_default_extend.field_account_invoice_analytic_tag_ids
 msgid "Analytic Tags"
-msgstr "Znaczniki analityczne"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: model:ir.model.fields,help:account_analystic_default_extend.field_account_analytic_default_documents_type
 msgid "Choice oring type of documents"
-msgstr "Choice oring type of documents"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: model:ir.model.fields,help:account_analystic_default_extend.field_account_analytic_default_operation_type
 msgid "Choice type of operation"
-msgstr "Choice type of operation"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: model:ir.ui.view,arch_db:account_analystic_default_extend.view_account_analytic_default_ext_form
 msgid "Conditions"
-msgstr "Warunki"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: model:ir.model.fields,field_description:account_analystic_default_extend.field_account_analytic_default_country_id
 msgid "Country"
-msgstr "Kraj"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,documents_type:0
 msgid "Customer Credit Note"
-msgstr "Customer Credit Note"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,usage:0
 msgid "Customer Location"
-msgstr "Customer Location"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,documents_type:0
 msgid "Customer invoice"
-msgstr "Customer invoice"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: model:ir.model.fields,field_description:account_analystic_default_extend.field_account_analytic_default_analytic_tag_ids
 msgid "Debit Analytic tags"
-msgstr "Debit Analytic tags"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: model:ir.model.fields,field_description:account_analystic_default_extend.field_account_analytic_default_documents_type
 msgid "Document type"
-msgstr "Document type"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,operation_type:0
 msgid "For Credit"
-msgstr "For Credit"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,operation_type:0
 msgid "For Debit"
-msgstr "For Debit"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,operation_type:0
 msgid "For Debit and Credit"
-msgstr "For Debit and Credit"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,documents_type:0
 msgid "From Purchase Order"
-msgstr "From Purchase Order"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,documents_type:0
 msgid "From Sale Order"
-msgstr "From Sale Order"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,documents_type:0
 msgid "Income Picking"
-msgstr "Income Picking"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: model:ir.model.fields,field_description:account_analystic_default_extend.field_account_analytic_default_categ_id
 msgid "Internal Category"
-msgstr "Kategoria wewnętrzna"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,usage:0
 msgid "Internal Location"
-msgstr "Internal Location"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,usage:0
 msgid "Inventory Loss"
-msgstr "Inventory Loss"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: model:ir.model,name:account_analystic_default_extend.model_account_invoice
 msgid "Invoice"
-msgstr "Faktura"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: model:ir.model,name:account_analystic_default_extend.model_account_invoice_line
 msgid "Invoice Line"
-msgstr "Pozycja faktury"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: model:ir.model.fields,field_description:account_analystic_default_extend.field_account_analytic_default_usage
 msgid "Location Type"
-msgstr "Typ strefy magazynowej"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: model:ir.model.fields,field_description:account_analystic_default_extend.field_account_analytic_default_operation_type
 msgid "Operation type"
-msgstr "Operation type"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,usage:0
 msgid "Procurement"
-msgstr "Procurement"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,usage:0
 msgid "Production"
-msgstr "Production"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: model:ir.model,name:account_analystic_default_extend.model_sale_order
 msgid "Quotation"
-msgstr "Oferta"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: model:ir.model,name:account_analystic_default_extend.model_sale_order_line
 msgid "Sales Order Line"
-msgstr "Pozycja zamówienia sprzedaży"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: model:ir.model.fields,field_description:account_analystic_default_extend.field_account_analytic_default_location_id
 msgid "Source Location"
-msgstr "Strefa źródłowa"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: model:ir.model,name:account_analystic_default_extend.model_stock_move
 msgid "Stock Move"
-msgstr "Przesunięcie zapasu"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,usage:0
 msgid "Transit Location"
-msgstr "Transit Location"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,usage:0
 msgid "Vendor Location"
-msgstr "Vendor Location"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,documents_type:0
 msgid "Ventor Credit Note"
-msgstr "Ventor Credit Note"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,documents_type:0
 msgid "Ventor bill"
-msgstr "Ventor bill"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,usage:0
 msgid "View"
-msgstr "View"
+msgstr ""
 
 #. module: account_analystic_default_extend
 #: selection:account.analytic.default,documents_type:0
 msgid "Оutgoing Picking"
-msgstr "Оutgoing Picking"
+msgstr ""
 
