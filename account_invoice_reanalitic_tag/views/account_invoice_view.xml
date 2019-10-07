@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="invoice_supplier_form" model="ir.ui.view">
+            <field name="name">account.invoice.supplier.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form/header" position="inside">
+                    <button name="action_invoice_edit" type="object" states="open,edit" string="Accountant" groups="account.group_account_invoice"/>
+                </xpath>
+                <!--
+                <xpath expr="//notebook/page/field[@name='invoice_line_ids']" position="attributes">
+                    <attribute name="invisible">[('state','in',['open'])]</attribute>
+                </xpath>
+                <xpath expr="//notebook/page/field[@name='invoice_line_ids']" position="after">
+                    <field context="{'type': type, 'journal_id': journal_id}" name="invoice_line_ids" attrs="{'invisible': [('state','in',['draft','paid','cancel'])]}">
+                        <tree string="Bill lines" editable="bottom" create="false">
+                            <field name="sequence" widget="handle" />
+                            <field name="product_id"
+                                context="{'partner_id': parent.partner_id}" domain="[('purchase_ok','=',True)]" readonly="1"/>
+                            <field name="name" readonly="1"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="account_id" groups="account.group_account_user"
+                                domain="[('company_id', '=', parent.company_id), ('internal_type', '=', 'other'), ('deprecated', '=', False)]"/>
+                            <field name="account_analytic_id" groups="analytic.group_analytic_accounting"
+                                domain="[('company_id', '=', parent.company_id)]"
+                                context="{'default_partner_id': parent.partner_id}"/>
+                            <field name="analytic_tag_ids" groups="analytic.group_analytic_accounting" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                            <field name="quantity" readonly="1"/>
+                            <field name="uom_id" groups="product.group_uom" readonly="1"/>
+                            <field name="price_unit" readonly="1"/>
+                            <field name="discount" groups="base.group_no_one" readonly="1"/>
+                            <field name="invoice_line_tax_ids" widget="many2many_tags" options="{'no_create': True}" context="{'type':parent.type}"
+                                domain="[('type_tax_use','=','purchase'),('company_id', '=', parent.company_id)]" readonly="1"/>
+                            <field name="price_subtotal" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </tree>
+                    </field>
+                </xpath>
+                -->
+            </field>
+        </record>
+        <record id="invoice_form" model="ir.ui.view">
+            <field name="name">account.invoice.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form/header" position="inside">
+                    <button name="action_invoice_edit" type="object" states="open" string="Accountant" groups="account.group_account_invoice"/>
+                </xpath>
+                <!--
+                <xpath expr="//notebook/page/field[@name='invoice_line_ids']" position="attributes">
+                    <attribute name="invisible">[('state','in',['open'])]</attribute>
+                </xpath>
+                <xpath expr="//notebook/page/field[@name='invoice_line_ids']" position="after">
+                    <field name="invoice_line_ids" nolabel="1" widget="one2many_list" mode="tree" context="{'type': type, 'journal_id': journal_id, 'default_invoice_id': id}" attrs="{'invisible': [('state','in',['draft','paid','cancel'])]}">
+                        <tree string="Invoice Lines" editable="bottom" create="false">
+                            <field name="sequence" widget="handle"/>
+                            <field name="product_id" domain="[('sale_ok','=',True)]" readonly="1"/>
+                            <field name="origin" invisible="1"/>
+                            <field name="is_rounding_line" invisible="1"/>
+                            <field name="name" readonly="1"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="account_id" groups="account.group_account_user"
+                                domain="[('company_id', '=', parent.company_id), ('internal_type', '=', 'other'), ('deprecated', '=', False)]"/>
+                            <field name="account_analytic_id" groups="analytic.group_analytic_accounting"
+                                domain="[('company_id', '=', parent.company_id)]"
+                                context="{'default_partner_id': parent.partner_id}"/>
+                            <field name="analytic_tag_ids" groups="analytic.group_analytic_accounting" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                            <field name="quantity" readonly="1"/>
+                            <field name="uom_id" groups="product.group_uom" readonly="1"/>
+                            <field name="price_unit" readonly="1"/>
+                            <field name="discount" groups="base.group_no_one" readonly="1"/>
+                            <field name="invoice_line_tax_ids" widget="many2many_tags" options="{'no_create': True}" context="{'type':parent.type}"
+                                domain="[('type_tax_use','=','sale'),('company_id', '=', parent.company_id)]" readonly="1"/>
+                            <field name="price_subtotal" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </tree>
+                    </field>
+                </xpath>
+                -->
+            </field>
+        </record>
+    </data>
+</odoo>
