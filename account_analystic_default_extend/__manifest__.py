@@ -22,7 +22,7 @@ Allows to automatically select analytic accounts based on criterions:
     * Date
     """,
     'website': 'https://www.odoo.com/page/accounting',
-    'depends': ['account_analytic_default'],
+    'depends': ['account_analytic_default', 'account', 'sale', 'stock'],
     'data': [
         'views/account_analytic_default_view.xml',
         'views/account_invoice_views.xml',

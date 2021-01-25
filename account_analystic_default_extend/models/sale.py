@@ -9,8 +9,7 @@ class SaleOrder(models.Model):
 
     @api.multi
     def action_invoice_create(self, grouped=False, final=False):
-        self = self.with_context(dict(self._context, force_document_type='saleorder'))
-        return super(SaleOrder, self).action_invoice_create(grouped=grouped, final=final)
+        return super(SaleOrder, self.with_context(dict(self._context, force_document_type='saleorder'))).action_invoice_create(grouped=grouped, final=final)
 
     #@api.multi
     #def _prepare_invoice(self):
